@@ -1,0 +1,145 @@
+@import "tailwindcss";
+
+:root {
+  --riiqx-black: #000000;
+  --riiqx-dark: #0a0a0a;
+  --riiqx-surface: #111111;
+  --riiqx-card: #181818;
+  --riiqx-border: #222222;
+  --riiqx-muted: #666666;
+  --riiqx-text: #f5f5f0;
+  --riiqx-neon: #39ff14;
+  --riiqx-neon-dim: #2bcc10;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--riiqx-black);
+  color: var(--riiqx-text);
+  font-family: "Inter", "DM Sans", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+/* Neon glow effect */
+.neon-glow {
+  box-shadow: 0 0 20px rgba(57, 255, 20, 0.15),
+    0 0 60px rgba(57, 255, 20, 0.05);
+}
+
+.neon-text {
+  text-shadow: 0 0 10px rgba(57, 255, 20, 0.5),
+    0 0 30px rgba(57, 255, 20, 0.2);
+}
+
+/* Agent card styles */
+.agent-card {
+  background: var(--riiqx-card);
+  border: 1px solid var(--riiqx-border);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.agent-card:hover {
+  border-color: rgba(57, 255, 20, 0.3);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+}
+
+/* JSON display */
+.json-display {
+  background: var(--riiqx-dark);
+  border: 1px solid var(--riiqx-border);
+  border-radius: 8px;
+  font-family: "JetBrains Mono", "Fira Code", monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--riiqx-border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--riiqx-muted);
+}
+
+/* Pulse animation for loading */
+@keyframes pulse-neon {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-pulse-neon {
+  animation: pulse-neon 1.5s ease-in-out infinite;
+}
+
+/* Gradient border animation */
+@keyframes border-glow {
+
+  0%,
+  100% {
+    border-color: rgba(57, 255, 20, 0.2);
+  }
+
+  50% {
+    border-color: rgba(57, 255, 20, 0.6);
+  }
+}
+
+.animate-border-glow {
+  animation: border-glow 2s ease-in-out infinite;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+  }
+
+  to {
+    opacity: 1;
+    max-height: 1000px;
+  }
+}
