@@ -1,0 +1,30 @@
+
+> riiqx-engine@0.1.0 build
+> next build
+
+ΓÜá Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of C:\Users\saswa\pnpm-lock.yaml as the root directory.
+ To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
+ Detected additional lockfiles: 
+   * C:\Users\saswa\OneDrive\Desktop\My New App\Musify\package-lock.json
+
+Γû▓ Next.js 16.1.6 (Turbopack)
+- Environments: .env.local
+
+  Creating an optimized production build ...
+Γ£ô Compiled successfully in 5.5s
+  Running TypeScript ...
+Failed to compile.
+
+./src/lib/video-generator.ts:11:1
+Type error: Unused '@ts-expect-error' directive.
+
+   9 | import type { Product } from "@/lib/products";
+  10 | import { getTrendingAudio, getTrackByStyle } from "@/lib/agents/trending-audio";
+> 11 | // @ts-expect-error no types for google-tts-api
+     | ^
+  12 | import * as googleTTS from "google-tts-api";
+  13 |
+  14 | const REEL_WIDTH = 1080;
+Next.js build worker exited with code: 1 and signal: null

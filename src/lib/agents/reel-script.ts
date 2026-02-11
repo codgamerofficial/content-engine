@@ -1,4 +1,9 @@
 import type { ReelScriptOutput, TrendScoutOutput } from "@/types/agents";
+import { localAIClient } from "../ai-client-local";
+
+// ============================================================================
+// Fallback Templates (used when AI is unavailable)
+// ============================================================================
 
 const REEL_TEMPLATES: ReelScriptOutput[] = [
     {
@@ -94,10 +99,47 @@ const REEL_TEMPLATES: ReelScriptOutput[] = [
     },
 ];
 
+// ============================================================================
+// AI-Powered Script Generation
+// ============================================================================
+
 export async function runReelScript(
+    imageBase64?: string,
     trends?: TrendScoutOutput[]
 ): Promise<ReelScriptOutput> {
-    // Pick reel template based on day rotation + trend alignment
+    // If image provided, use AI to generate personalized script
+    if (imageBase64) {
+        try {
+            console.log("[ReelScript] Generating AI-powered script from image...");
+
+            const trendNames = trends?.map(t => t.trend_name) || [];
+
+            const result = await localAIClient.generateReelScriptFromImage(imageBase64, {
+                goal: "reach",
+                trends: trendNames,
+            });
+
+            // Convert AI result to ReelScriptOutput format
+            return {
+                reel_goal: "reach",
+                hook_0_to_2_seconds: result.hook,
+                scene_breakdown: [
+                    `Scene 1 (0-5s): ${result.hook}`,
+                    `Scene 2 (5-20s): ${result.body}`,
+                    `Scene 3 (20-30s): ${result.cta}`,
+                ],
+                on_screen_text: result.onScreenText,
+                caption: result.caption,
+                hashtags: result.hashtags,
+                cta: result.cta,
+            };
+        } catch (error) {
+            console.warn("[ReelScript] AI generation failed, using template:", error);
+            // Fall through to template-based generation
+        }
+    }
+
+    // Template-based generation (existing logic)
     const dayIndex = new Date().getDay();
     const template = REEL_TEMPLATES[dayIndex % REEL_TEMPLATES.length];
 
@@ -112,4 +154,66 @@ export async function runReelScript(
     }
 
     return template;
+}
+
+/**
+ * Generate script with full image analysis and content creation
+ */
+export async function generateFullReelContent(
+    imageBase64: string,
+    options: {
+        goal?: "reach" | "engagement" | "conversion";
+        productContext?: string;
+        includeVoiceover?: boolean;
+    } = {}
+): Promise<{
+    script: ReelScriptOutput;
+    imageAnalysis: {
+        description: string;
+        features: string[];
+        style: string;
+        mood: string;
+    };
+    voiceover?: { audioUrl?: string; audioBase64?: string; text: string };
+}> {
+    try {
+        const result = await localAIClient.generateReelContent(imageBase64, options);
+
+        return {
+            script: {
+                reel_goal: options.goal || "reach",
+                hook_0_to_2_seconds: result.script.hook,
+                scene_breakdown: [
+                    `Scene 1 (0-5s): ${result.script.hook}`,
+                    `Scene 2 (5-20s): ${result.script.body}`,
+                    `Scene 3 (20-30s): ${result.script.cta}`,
+                ],
+                on_screen_text: result.script.onScreenText,
+                caption: result.script.caption,
+                hashtags: result.script.hashtags,
+                cta: result.script.cta,
+            },
+            imageAnalysis: {
+                description: result.imageAnalysis.productDescription,
+                features: result.imageAnalysis.keyFeatures,
+                style: result.imageAnalysis.suggestedStyle,
+                mood: result.imageAnalysis.mood,
+            },
+            voiceover: result.voiceover,
+        };
+    } catch (error) {
+        console.error("[ReelScript] Full content generation failed:", error);
+
+        // Fallback to template
+        const template = REEL_TEMPLATES[0];
+        return {
+            script: template,
+            imageAnalysis: {
+                description: "Product analysis unavailable",
+                features: [],
+                style: "modern",
+                mood: "neutral",
+            },
+        };
+    }
 }

@@ -36,35 +36,20 @@ export type GeneratedContent =
     | GeneratedCarousel
     | GeneratedReelScript;
 
-// ─── Gemini API ──────────────────────────────────────────
+import { aiClient } from "@/lib/ai-client";
 
-async function callGemini(prompt: string): Promise<string> {
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) throw new Error("NO_API_KEY");
+// ─── AI Client Wrapper ───────────────────────────────────
 
-    const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
-        {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                contents: [{ parts: [{ text: prompt }] }],
-                generationConfig: {
-                    temperature: 0.9,
-                    maxOutputTokens: 1500,
-                    responseMimeType: "application/json",
-                },
-            }),
-        }
-    );
-
-    if (!res.ok) {
-        const err = await res.json();
-        throw new Error(`Gemini API error: ${JSON.stringify(err)}`);
+async function generateAIContent(prompt: string, json: boolean = true): Promise<string> {
+    try {
+        return await aiClient.generate(prompt, {
+            json,
+            temperature: 0.7
+        });
+    } catch (error) {
+        console.error("AI Generation Failed:", error);
+        throw new Error("AI_SERVICE_UNAVAILABLE");
     }
-
-    const data = await res.json();
-    return data.candidates?.[0]?.content?.parts?.[0]?.text || "";
 }
 
 // ─── Generate Single Post ────────────────────────────────
@@ -94,7 +79,7 @@ Rules:
 - Make it scroll-stopping`;
 
     try {
-        const raw = await callGemini(prompt);
+        const raw = await generateAIContent(prompt);
         const parsed = JSON.parse(raw);
         return {
             type: "image",
@@ -104,10 +89,10 @@ Rules:
             imageUrl: product.images[0],
         };
     } catch (err) {
-        if (err instanceof Error && err.message === "NO_API_KEY") {
+        if (err instanceof Error && err.message === "AI_SERVICE_UNAVAILABLE") {
             return generatePostFallback(product);
         }
-        console.error("Gemini post generation failed, using fallback:", err);
+        console.error("AI post generation failed, using fallback:", err);
         return generatePostFallback(product);
     }
 }
@@ -174,7 +159,7 @@ Rules:
 - Carousel theme should tell a story`;
 
     try {
-        const raw = await callGemini(prompt);
+        const raw = await generateAIContent(prompt);
         const parsed = JSON.parse(raw);
         return {
             type: "carousel",
@@ -189,10 +174,10 @@ Rules:
             ),
         };
     } catch (err) {
-        if (err instanceof Error && err.message === "NO_API_KEY") {
+        if (err instanceof Error && err.message === "AI_SERVICE_UNAVAILABLE") {
             return generateCarouselFallback(product);
         }
-        console.error("Gemini carousel generation failed, using fallback:", err);
+        console.error("AI carousel generation failed, using fallback:", err);
         return generateCarouselFallback(product);
     }
 }
@@ -270,7 +255,7 @@ Rules:
 - End with clear conversion action`;
 
     try {
-        const raw = await callGemini(prompt);
+        const raw = await generateAIContent(prompt);
         const parsed = JSON.parse(raw);
         return {
             type: "reel",
@@ -281,10 +266,10 @@ Rules:
             cta: parsed.cta,
         };
     } catch (err) {
-        if (err instanceof Error && err.message === "NO_API_KEY") {
+        if (err instanceof Error && err.message === "AI_SERVICE_UNAVAILABLE") {
             return generateReelFallback(product);
         }
-        console.error("Gemini reel generation failed, using fallback:", err);
+        console.error("AI reel generation failed, using fallback:", err);
         return generateReelFallback(product);
     }
 }

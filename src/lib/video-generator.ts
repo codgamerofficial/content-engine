@@ -8,7 +8,7 @@ import * as path from "path";
 import * as os from "os";
 import type { Product } from "@/lib/products";
 import { getTrendingAudio, getTrackByStyle } from "@/lib/agents/trending-audio";
-// @ts-expect-error no types for google-tts-api
+
 import * as googleTTS from "google-tts-api";
 
 const REEL_WIDTH = 1080;
