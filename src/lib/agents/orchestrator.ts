@@ -15,7 +15,7 @@ export async function runOrchestrator(): Promise<OrchestratorOutput> {
     const brandIntel = await runBrandIntel();
 
     // Step 3: Generate reel script (depends on trends)
-    const reelScript = await runReelScript(trends);
+    const reelScript = await runReelScript(undefined, trends);
 
     // Step 4: Generate design prompts (depends on reel script)
     const canvaPrompts = await runCanvaPrompts(reelScript);
